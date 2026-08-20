@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MAJU | Online Style & Tech Hub</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f6f7f9;color:#17202a}header{background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:10}.nav{max-width:1150px;margin:auto;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}.logo{font-size:27px;font-weight:900;letter-spacing:2px}.logo small{display:block;font-size:9px;letter-spacing:2px;color:#6b7280}.search{display:flex;flex:1;min-width:220px}.search input{width:100%;padding:12px;border:1px solid #d9dde3;border-radius:9px 0 0 9px;font-size:15px}.search button,.cart{border:0;background:#111827;color:#fff;padding:12px 16px;font-weight:700}.search button{border-radius:0 9px 9px 0}.cart{border-radius:9px;cursor:pointer}.hero{background:#111827;color:#fff}.hero-in{max-width:1150px;margin:auto;padding:58px 18px}.hero h1{font-size:clamp(38px,6vw,62px);max-width:700px;margin:0 0 15px}.hero p{color:#d1d5db;max-width:650px;font-size:17px;line-height:1.6}.btn{display:inline-block;padding:12px 18px;border:0;border-radius:9px;font-weight:700;cursor:pointer}.hero .btn{margin-top:8px}.wrap{max-width:1150px;margin:auto;padding:35px 18px}.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 35px}.cat{background:#fff;border:1px solid #e4e7eb;border-radius:12px;padding:20px;text-align:center;font-weight:700;cursor:pointer}.products{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{background:#fff;border:1px solid #e4e7eb;border-radius:13px;overflow:hidden}.pic{height:205px;background:#eef0f3;display:flex;align-items:center;justify-content:center;color:#737b86;font-weight:700}.pic img{width:100%;height:100%;object-fit:cover}.body{padding:15px}.body h3{margin:0 0 7px}.desc{color:#6b7280;font-size:13px;min-height:38px}.price{font-size:20px;font-weight:800;margin:12px 0}.stock{font-size:12px;color:#6b7280;margin-bottom:9px}.add{width:100%;padding:11px;background:#111827;color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer}.add:disabled{background:#aaa;cursor:not-allowed}.contact{margin-top:40px;background:#fff;padding:25px;border-radius:13px;border:1px solid #e4e7eb}footer{background:#111827;color:#d1d5db;text-align:center;padding:28px;margin-top:45px}.cart-panel{position:fixed;right:-430px;top:0;width:400px;max-width:100%;height:100%;background:#fff;z-index:30;box-shadow:-8px 0 25px #0002;padding:22px;transition:.25s;overflow:auto}.cart-panel.open{right:0}.close{float:right;border:0;padding:8px;border-radius:7px}.cart-item{border-bottom:1px solid #eee;padding:13px 0}.qty{display:flex;gap:8px;align-items:center;margin-top:8px}.qty button{border:1px solid #ddd;background:#fff;border-radius:6px;padding:4px 9px}.total{font-weight:800;font-size:20px;margin:20px 0}.wa{width:100%;background:#168b45;color:#fff;border:0;padding:13px;border-radius:9px;font-weight:800;cursor:pointer}.note{font-size:12px;color:#6b7280;margin-top:8px;line-height:1.5}
+@media(max-width:900px){.products{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.products{grid-template-columns:repeat(2,1fr)}.cats{grid-template-columns:repeat(2,1fr)}}@media(max-width:500px){.products{grid-template-columns:1fr}.cats{grid-template-columns:1fr}.hero-in{padding:45px 18px}}
+</style>
+</head>
+<body>
+<header><div class="nav">
+  <div class="logo">MAJU<small>ONLINE STYLE & TECH HUB</small></div>
+  <div class="search"><input id="search" placeholder="Search products..."><button onclick="render()">Search</button></div>
+  <button class="cart" onclick="toggleCart()">🛒 Cart (<span id="count">0</span>)</button>
+</div></header>
+
+<section class="hero"><div class="hero-in">
+  <h1>Simple shopping. Easy ordering.</h1>
+  <p>Shop clothing, electronics, accessories and more from MAJU. Add what you want to your cart and send your order directly to WhatsApp.</p>
+  <button class="btn" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+</div></section>
+
+<main class="wrap">
+<h2>Shop by Category</h2>
+<div class="cats">
+ <div class="cat" onclick="filter('Clothing')">👕 Clothing</div>
+ <div class="cat" onclick="filter('Electronics')">📱 Electronics</div>
+ <div class="cat" onclick="filter('Accessories')">👜 Accessories</div>
+ <div class="cat" onclick="filter('all')">🛍️ View All</div>
+</div>
+
+<section id="products"><h2>Products</h2><div class="products" id="grid"></div></section>
+
+<section class="contact">
+<h2>Contact MAJU</h2>
+<p>Need help with a product or order? Send us a WhatsApp message.</p>
+<p><b>WhatsApp:</b> <span id="phone">+27</span></p>
+<p><a href="admin.html">Admin Dashboard</a></p>
+</section>
+</main>
+
+<footer>© 2026 MAJU. All rights reserved.</footer>
+
+<aside class="cart-panel" id="cart">
+<button class="close" onclick="toggleCart()">✕</button>
+<h2>Your Cart</h2>
+<div id="items">Your cart is empty.</div>
+<div class="total">Total: R<span id="total">0</span></div>
+<button class="wa" onclick="checkout()">Order on WhatsApp</button>
+<div class="note">Your order will open in WhatsApp with the products and total already written for you.</div>
+</aside>
+
+<script>
+const DEFAULT_SETTINGS = {storeName:"MAJU",whatsapp:"27820000000",currency:"R",tagline:"Online Style & Tech Hub"};
+const DEFAULT_PRODUCTS = [
+{id:1,name:"Classic MAJU T-Shirt",category:"Clothing",price:299,stock:10,description:"Comfortable everyday T-shirt.",image:""},
+{id:2,name:"Premium Hoodie",category:"Clothing",price:599,stock:8,description:"Modern hoodie for everyday wear.",image:""},
+{id:3,name:"Wireless Headphones",category:"Electronics",price:899,stock:6,description:"Wireless audio for work and travel.",image:""},
+{id:4,name:"Smart Watch",category:"Electronics",price:1299,stock:5,description:"Modern smartwatch with useful features.",image:""},
+{id:5,name:"Everyday Backpack",category:"Accessories",price:449,stock:9,description:"Practical backpack for daily use.",image:""},
+{id:6,name:"Classic Sunglasses",category:"Accessories",price:249,stock:12,description:"Simple and stylish everyday sunglasses.",image:""}];
+function getProducts(){try{const s=localStorage.getItem("maju_products");if(s)return JSON.parse(s)}catch(e){} localStorage.setItem("maju_products",JSON.stringify(DEFAULT_PRODUCTS));return DEFAULT_PRODUCTS}
+function saveProducts(p){localStorage.setItem("maju_products",JSON.stringify(p))}
+function getSettings(){try{return {...DEFAULT_SETTINGS,...(JSON.parse(localStorage.getItem("maju_settings"))||{})}}catch(e){return {...DEFAULT_SETTINGS}}}
+function getOrders(){try{return JSON.parse(localStorage.getItem("maju_orders"))||[]}catch(e){return []}}
+function saveOrders(o){localStorage.setItem("maju_orders",JSON.stringify(o))}
+function money(n){return Number(n||0).toLocaleString("en-ZA",{minimumFractionDigits:0,maximumFractionDigits:2})}
+function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+</script>
+<script>
+let products=getProducts(), cart=[], settings=getSettings();
+document.getElementById("phone").textContent=settings.whatsapp ? "+"+settings.whatsapp : "Not set";
+
+function render(list=products){
+ let q=document.getElementById("search").value.toLowerCase().trim();
+ if(q) list=list.filter(p=>(p.name+" "+p.description+" "+p.category).toLowerCase().includes(q));
+ document.getElementById("grid").innerHTML=list.map(p=>{
+   const stock=Number(p.stock||0);
+   return `<article class="card">
+   <div class="pic">${p.image?`<img src="${p.image}" alt="${esc(p.name)}">`:"PRODUCT PHOTO"}</div>
+   <div class="body"><h3>${esc(p.name)}</h3><p class="desc">${esc(p.description)}</p>
+   <div class="price">R${money(p.price)}</div><div class="stock">${stock>0?stock+" in stock":"Out of stock"}</div>
+   <button class="add" ${stock<1?"disabled":""} onclick="add(${p.id})">${stock>0?"Add to Cart":"Out of Stock"}</button>
+   </div></article>`;
+ }).join("") || "<p>No products found.</p>";
+}
+function filter(c){render(c==="all"?products:products.filter(p=>p.category===c))}
+function add(id){const p=products.find(x=>x.id===id);if(!p||Number(p.stock||0)<1)return;const x=cart.find(i=>i.id===id);if(x)x.qty++;else cart.push({...p,qty:1});updateCart()}
+function changeQty(id,d){const x=cart.find(i=>i.id===id);if(!x)return;x.qty+=d;if(x.qty<=0)cart=cart.filter(i=>i.id!==id);updateCart()}
+function updateCart(){
+ document.getElementById("count").textContent=cart.reduce((a,x)=>a+x.qty,0);
+ document.getElementById("items").innerHTML=cart.length?cart.map(p=>`<div class="cart-item"><b>${esc(p.name)}</b><br>R${money(p.price)} × ${p.qty}<div class="qty"><button onclick="changeQty(${p.id},-1)">−</button><span>${p.qty}</span><button onclick="changeQty(${p.id},1)">+</button><button onclick="changeQty(${p.id},-${p.qty})">Remove</button></div></div>`).join(""):"Your cart is empty.";
+ document.getElementById("total").textContent=money(cart.reduce((a,p)=>a+Number(p.price)*p.qty,0));
+}
+function toggleCart(){document.getElementById("cart").classList.toggle("open")}
+function checkout(){
+ if(!cart.length){alert("Your cart is empty.");return}
+ settings=getSettings();
+ const lines=cart.map(p=>`• ${p.name} x${p.qty} — R${money(p.price*p.qty)}`).join("\n");
+ const total=cart.reduce((a,p)=>a+Number(p.price)*p.qty,0);
+ const text=`Hello MAJU, I would like to place an order:\n\n${lines}\n\nTotal: R${money(total)}\n\nPlease confirm availability and delivery details.`;
+ const number=(settings.whatsapp||"").replace(/\D/g,"");
+ if(!number){alert("Please add your WhatsApp number in the Admin Dashboard first.");return}
+ const orders=getOrders();
+ orders.unshift({id:Date.now(),date:new Date().toLocaleString("en-ZA"),items:cart.map(p=>({name:p.name,qty:p.qty,price:p.price})),total,status:"New"});
+ saveOrders(orders);
+ window.open("https://wa.me/"+number+"?text="+encodeURIComponent(text),"_blank");
+}
+document.getElementById("search").addEventListener("input",()=>render());
+render();updateCart();
+</script>
+</body></html>
