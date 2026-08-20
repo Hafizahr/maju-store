@@ -1,24 +1,89 @@
-const SUPABASE_URL = "https://exfrvhnizrvrkkmqizrs.supabase.co";
-const SUPABASE_KEY = "sb_publishable_jPA2brk-iAQ7fsdJZZh13Q_Mf0dUfj8";
+const DEFAULT_SETTINGS = {
+  storeName: "MAJU",
+  whatsapp: "27820000000",
+  currency: "R",
+  tagline: "Online Style & Tech Hub"
+};
 
-async function supabaseRequest(path, options = {}) {
-  const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
-    ...options,
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=representation",
-      ...(options.headers || {})
+const DEFAULT_PRODUCTS = [
+  {id:1,name:"Classic MAJU T-Shirt",category:"Clothing",price:299,stock:10,description:"Comfortable everyday T-shirt.",image:""},
+  {id:2,name:"Premium Hoodie",category:"Clothing",price:599,stock:8,description:"Modern hoodie for everyday wear.",image:""},
+  {id:3,name:"Wireless Headphones",category:"Electronics",price:899,stock:6,description:"Wireless audio for work and travel.",image:""},
+  {id:4,name:"Smart Watch",category:"Electronics",price:1299,stock:5,description:"Modern smartwatch with useful features.",image:""},
+  {id:5,name:"Everyday Backpack",category:"Accessories",price:449,stock:9,description:"Practical backpack for daily use.",image:""},
+  {id:6,name:"Classic Sunglasses",category:"Accessories",price:249,stock:12,description:"Simple and stylish everyday sunglasses.",image:""}
+];
+
+async function getProducts() {
+  try {
+    const products = await supabaseRequest(
+      "products?select=*&order=id.asc"
+    );
+
+    if (Array.isArray(products) && products.length > 0) {
+      return products;
     }
-  });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Supabase error: ${response.status}`);
+    return DEFAULT_PRODUCTS;
+  } catch (error) {
+    console.error("Could not load products from Supabase:", error);
+
+    try {
+      const saved = localStorage.getItem("maju_products");
+      if (saved) return JSON.parse(saved);
+    } catch(e) {}
+
+    return DEFAULT_PRODUCTS;
   }
+}
 
-  if (response.status === 204) return null;
+function saveProducts(products) {
+  localStorage.setItem("maju_products", JSON.stringify(products));
+}
 
-  return response.json();
+function getSettings() {
+  try {
+    return {
+      ...DEFAULT_SETTINGS,
+      ...(JSON.parse(localStorage.getItem("maju_settings")) || {})
+    };
+  } catch(e) {
+    return {...DEFAULT_SETTINGS};
+  }
+}
+
+function saveSettings(settings) {
+  localStorage.setItem("maju_settings", JSON.stringify(settings));
+}
+
+function getOrders() {
+  try {
+    return JSON.parse(localStorage.getItem("maju_orders")) || [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveOrders(orders) {
+  localStorage.setItem("maju_orders", JSON.stringify(orders));
+}
+
+function money(n) {
+  return Number(n || 0).toLocaleString("en-ZA", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  });
+}
+
+function esc(s = "") {
+  return String(s).replace(
+    /[&<>"']/g,
+    m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#39;"
+    }[m])
+  );
 }
