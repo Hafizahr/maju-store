@@ -61,8 +61,18 @@ const DEFAULT_PRODUCTS = [
 {id:4,name:"Smart Watch",category:"Electronics",price:1299,stock:5,description:"Modern smartwatch with useful features.",image:""},
 {id:5,name:"Everyday Backpack",category:"Accessories",price:449,stock:9,description:"Practical backpack for daily use.",image:""},
 {id:6,name:"Classic Sunglasses",category:"Accessories",price:249,stock:12,description:"Simple and stylish everyday sunglasses.",image:""}];
-function getProducts(){try{const s=localStorage.getItem("maju_products");if(s)return JSON.parse(s)}catch(e){} localStorage.setItem("maju_products",JSON.stringify(DEFAULT_PRODUCTS));return DEFAULT_PRODUCTS}
-function saveProducts(p){localStorage.setItem("maju_products",JSON.stringify(p))}
+async function getProducts(){
+  try {
+    const products = await supabaseRequest("products?select=*&order=id.asc");
+    if (Array.isArray(products) && products.length > 0) {
+      return products;
+    }
+  } catch(e) {
+    console.error("Could not load products from Supabase:", e);
+  }
+
+  return DEFAULT_PRODUCTS;
+}function saveProducts(p){localStorage.setItem("maju_products",JSON.stringify(p))}
 function getSettings(){try{return {...DEFAULT_SETTINGS,...(JSON.parse(localStorage.getItem("maju_settings"))||{})}}catch(e){return {...DEFAULT_SETTINGS}}}
 function getOrders(){try{return JSON.parse(localStorage.getItem("maju_orders"))||[]}catch(e){return []}}
 function saveOrders(o){localStorage.setItem("maju_orders",JSON.stringify(o))}
@@ -70,7 +80,16 @@ function money(n){return Number(n||0).toLocaleString("en-ZA",{minimumFractionDig
 function esc(s=""){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 </script>
 <script>
-let products=getProducts(), cart=[], settings=getSettings();
+let products=[], cart=[], settings=getSettings();
+
+async function startStore(){
+  products = await getProducts();
+  document.getElementById("phone").textContent=settings.whatsapp ? "+"+settings.whatsapp : "Not set";
+  render();
+  updateCart();
+}
+
+startStore();
 document.getElementById("phone").textContent=settings.whatsapp ? "+"+settings.whatsapp : "Not set";
 
 function render(list=products){
@@ -109,6 +128,6 @@ function checkout(){
  window.open("https://wa.me/"+number+"?text="+encodeURIComponent(text),"_blank");
 }
 document.getElementById("search").addEventListener("input",()=>render());
-render();updateCart();
+
 </script>
 </body></html>
